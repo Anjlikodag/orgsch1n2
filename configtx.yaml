@@ -1,0 +1,243 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/workspace/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+    - &apple
+        Name: appleMSP
+        ID: appleMSP
+        MSPDir: crypto-config/peerOrganizations/apple.workspace/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('appleMSP.admin', 'appleMSP.peer', 'appleMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('appleMSP.admin', 'appleMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('appleMSP.admin')"
+        AnchorPeers:
+            - Host: peer1.apple.workspace
+              Port: 7051
+
+    - &microsoft
+        Name: microsoftMSP
+        ID: microsoftMSP
+        MSPDir: crypto-config/peerOrganizations/microsoft.workspace/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('microsoftMSP.admin', 'microsoftMSP.peer', 'microsoftMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('microsoftMSP.admin', 'microsoftMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('microsoftMSP.admin')"
+
+        AnchorPeers:
+            - Host: peer1.microsoft.workspace
+              Port: 9051
+
+    - &fiserv
+        Name: fiservMSP
+        ID: fiservMSP
+        MSPDir: crypto-config/peerOrganizations/fiserv.workspace/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('fiservMSP.admin', 'fiservMSP.peer', 'fiservMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('fiservMSP.admin', 'fiservMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('fiservMSP.admin')"
+
+        AnchorPeers:
+            - Host: peer1.fiserv.workspace
+              Port: 11051
+        
+    - &cbAccounts
+        Name: cbAccountsMSP
+        ID: cbAccountsMSP
+        MSPDir: crypto-config/peerOrganizations/cbAccounts.workspace/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('cbAccountsMSP.admin', 'cbAccountsMSP.peer', 'cbAccountsMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('cbAccountsMSP.admin', 'cbAccountsMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('cbAccountsMSP.admin')"
+
+        AnchorPeers:
+            - Host: peer1.cbAccounts.workspace
+              Port: 13051
+
+    - &citizenBank
+        Name: citizenBankMSP
+        ID: citizenBankMSP
+        MSPDir: crypto-config/peerOrganizations/citizenBank.workspace/msp
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('citizenBankMSP.admin', 'citizenBankMSP.peer', 'citizenBankMSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('citizenBankMSP.admin', 'citizenBankMSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('citizenBankMSP.admin')"
+
+        AnchorPeers:
+            - Host: peer1.citizenBank.workspace
+              Port: 14051
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_4_3: true
+        V1_3: false
+        V1_1: false
+    Orderer: &OrdererCapabilities
+        V1_4_2: true
+        V1_1: false
+    Application: &ApplicationCapabilities
+        V1_4_2: true
+        V1_3: false
+        V1_2: false
+        V1_1: false
+
+Application: &ApplicationDefaults
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+    BatchTimeout: 2s
+    BatchSize:
+        MaxMessageCount: 10
+        AbsoluteMaxBytes: 99 MB
+        PreferredMaxBytes: 512 KB
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ChannelCapabilities
+
+Profiles:
+    FourOrgsChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *apple
+                - *fiserv
+                - *cbAccounts
+                - *citizenBank
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    FiveOrgsChannel:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *microsoft
+                - *fiserv
+                - *cbAccounts
+                - *citizenBank
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    Raft:
+        <<: *ChannelDefaults
+        Capabilities:
+            <<: *ChannelCapabilities
+        Orderer:
+            <<: *OrdererDefaults
+            OrdererType: etcdraft
+            EtcdRaft:
+                Consenters:
+                - Host: orderer1.workspace
+                  Port: 7050
+                  ClientTLSCert: crypto-config/ordererOrganizations/workspace/orderers/orderer1.workspace/tls/server.crt
+                  ServerTLSCert: crypto-config/ordererOrganizations/workspace/orderers/orderer1.workspace/tls/server.crt
+               
+            Addresses:
+                - orderer1.workspace:7050
+               
+            Organizations:
+            - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+            - <<: *OrdererOrg
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                - *apple
+                - *microsoft
+                - *fiserv
+                - *cbAccounts
+                - *citizenBank

@@ -1,0 +1,64 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+OrdererOrgs:
+
+  - Name: Orderer
+    Domain: workspace
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 5
+      
+
+PeerOrgs:
+  - Name: apple
+    Domain: apple.workspace
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 2
+    Users:
+      Start: 1
+      Count: 1
+
+  - Name: microsoft
+    Domain: microsoft.workspace
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 2
+    Users:
+      Count: 1
+  
+  - Name: fiserv
+    Domain: fiserv.workspace
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 2
+    Users:
+      Start: 1
+      Count: 1
+
+  - Name: cbAccounts
+    Domain: cbAccounts.workspace
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 2
+    Users:
+      Start: 1
+      Count: 1
+
+  - Name: citizenBank
+    Domain: citizenBank.workspace
+    EnableNodeOUs: true
+    Template:
+      Start: 1
+      Count: 2
+    Users:
+      Start: 1
+      Count: 1
